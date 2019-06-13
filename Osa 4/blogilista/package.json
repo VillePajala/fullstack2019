@@ -1,0 +1,18 @@
+{
+  "name": "blogilista",
+  "version": "1.0.0",
+  "description": "Back-end for a blog listing application",
+  "main": "index.js",
+  "scripts": {
+    "lint": "eslint .",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Ville Pajala",
+  "license": "MIT",
+  "dependencies": {
+    "eslint": "^5.16.0",
+    "express": "^4.17.1",
+    "nodemon": "^1.19.1"
+  }
+}
