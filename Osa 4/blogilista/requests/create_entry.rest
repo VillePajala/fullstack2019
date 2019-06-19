@@ -1,9 +1,11 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1sdXVra2FpIiwiaWQiOiI1ZDA4ZGMxMDRlMWY5ZDJlZGJjMWM4YmMiLCJpYXQiOjE1NjA5MzcxMDV9.C-vLC0RBellscbebBUTCBsUKkYGADZ2oWHhpOjxOPq0
 
 {
-    "title": "The WebSite 2",
-    "author": "Ville Johannes Pajala",
-    "url": "https://www.villejohannespajala.com",
-    "likes": 333
+    "title": "The WebSite 6",
+    "author": "Ville J46eeros",
+    "url": "https://www.viespdfhdfhdfhajalanderos.com",
+    "likes": 33,
+    "userId" : "5d08dc104e1f9d2edbc1c8bc"
 }
