@@ -1,9 +1,12 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react'
 import loginService from './services/login'
 import blogService from './services/blogs'
 import userService from './services/users'
 import Blog from './components/Blog'
 import Notification from './components/Notification'
+import BlogForm from './components/BlogForm'
+import LoginForm from './components/LoginForm'
+import Togglable from './components/Togglable'
 import './index.css'
 
 
@@ -17,8 +20,10 @@ function App() {
   const [ username, setUsername ] = useState('')
   const [ password, setPassword ] = useState('')
   const [ user, setUser ] = useState(null)
+  const [ blogId, setBlogId ] = useState('')
 
-  
+  const blogFormRef = React.createRef()
+
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
@@ -32,10 +37,9 @@ function App() {
     blogService
       .getAll()
       .then(initialBlogs => {
-        setBlogs(initialBlogs)
+        setBlogs(initialBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1))
       })
   }, [])
-
 
   const handleLogin = async (event) => {
     event.preventDefault()
@@ -66,6 +70,72 @@ function App() {
     }
   }
 
+  const updateBlog = async (id) => {
+    try {
+      const blogToUpdate = await blogs.filter(blog => blog.id === id)
+
+      const blogUpdate =
+        {
+          'user' : blogToUpdate[0].user.id,
+          'likes' : blogToUpdate[0].likes + 1,
+          'author' : blogToUpdate[0].author,
+          'title' :  blogToUpdate[0].title,
+          'url' : blogToUpdate[0].url
+        }
+
+      blogService
+        .update(id, blogUpdate)
+        .then(blogUpdate => {
+          setColor('message')
+          setMessage(`${blogUpdate.title} liked`)
+          setTimeout(() => {
+            setMessage(null)
+          }, 5000)
+        })
+
+      blogService
+        .getAll()
+        .then(initialBlogs => {
+          setBlogs(initialBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1))
+        })
+    } catch (exception) {
+      setColor('error')
+      setMessage('something went wrong, try again')
+      setTimeout(() => {
+        setMessage(null)
+      }, 5000)
+    }
+  }
+
+  const deleteBlog = (id) => {
+    const blogToDelete = blogs.filter(blog => blog.id === id)
+    if (window.confirm(`Delete ${blogToDelete[0].title}?`)) {
+      try {
+        blogService
+          .remove(id)
+          .then(deletedBlog => {  // eslint-disable-line no-unused-vars
+            setColor('message')
+            setMessage(`Deleted ${blogToDelete[0].title}`)
+            setTimeout(() => {
+              setMessage(null)
+            }, 5000)
+          })
+
+        blogService
+          .getAll()
+          .then(initialBlogs => {
+            setBlogs(initialBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1))
+          })
+      } catch (exception) {
+        setColor('error')
+        setMessage(`Blog ${blogToDelete[0].title} has already been moved from server`)
+        setTimeout(() => {
+          setMessage(null)
+        }, 5000)
+      }
+    }
+  }
+
   const handleBlogPost = async (event) => {
     event.preventDefault()
     try {
@@ -74,13 +144,13 @@ function App() {
 
       const blogPost =
         {
-          "title" : title,
-          "author" : author,
-          "url" : url,
-          "likes" : 0,
-          "userId" : loggedinUser.id
+          'title' : title,
+          'author' : author,
+          'url' : url,
+          'likes' : 0,
+          'userId' : loggedinUser.id
         }
-      
+
       blogService
         .create(blogPost)
         .then(returnedBlogs => {
@@ -91,7 +161,13 @@ function App() {
             setMessage(null)
           }, 5000)
         })
-  
+
+      blogService
+        .getAll()
+        .then(initialBlogs => {
+          setBlogs(initialBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1))
+        })
+
       blogService.setToken(user.token)
       setTitle('')
       setAuthor('')
@@ -105,92 +181,83 @@ function App() {
     }
   }
 
-  const loginForm = () => (
-    <form onSubmit={handleLogin}>
-        <div>
-          username
-            <input
-            type="text"
-            value={username}
-            name="Username"
-            onChange={({ target }) => setUsername(target.value)}
-            />
-        </div>
-        <div>
-          password
-            <input
-            type="password"
-            value={password}
-            name="password"
-            onChange={({ target }) => setPassword(target.value)}
-              />
-        </div>
-        <button type="submit">login</button>
-      </form>
-  )
+  const blogTitles = () => blogs.map((blog) => {
 
-  const userBlogs = () => blogs.map((blog) => {
-    if (blog.user.username === user.username) {
-      return <div key={blog.id}>{blog.title} </div>
+
+    const blogStyle = {
+      paddingTop: 10,
+      paddingLeft: 2,
+      border: 'solid',
+      borderWidth: 1,
+      marginBottom: 5
+    }
+
+    if (blog.id !== blogId) {
+      return (
+        <div style={blogStyle} key={blog.id} onClick={() => setBlogId(blog.id)}>
+          {blog.title}
+        </div>
+      )
+    } else if (blog.user.username === user.username) {
+      return (
+        <div style={blogStyle} key={blog.id} onClick={() => setBlogId('')}>
+          {blog.title} {blog.author}<br />
+          <a href="{blog.url}">{blog.url}</a><br />
+          {blog.likes} likes <button onClick={() => updateBlog(blog.id)}>like</button><br />
+          added by {blog.user.username}<br />
+          <button onClick={() => deleteBlog(blog.id)}>remove</button>
+        </div>
+      )
     } else {
-      return ''
+      return (
+        <div style={blogStyle} key={blog.id} onClick={() => setBlogId('')}>
+          {blog.title} {blog.author}<br />
+          <a href="{blog.url}">{blog.url}</a><br />
+          {blog.likes} likes <button onClick={() => updateBlog(blog.id)}>like</button><br />
+          added by {blog.user.username}<br />
+        </div>
+      )
     }
   })
-
-  const blogForm = () => (
-    <div>
-      <form onSubmit={handleBlogPost}>
-        <div>
-          title:
-            <input
-            type="text"
-            value={title}
-            name="title"
-            onChange={({ target }) => setTitle(target.value)}
-            />
-        </div>
-        <div>
-          author
-            <input
-            type="text"
-            value={author}
-            name="author"
-            onChange={({ target }) => setAuthor(target.value)}
-            />
-        </div>
-        <div>
-          url
-            <input
-            type="text"
-            value={url}
-            name="url"
-            onChange={({ target }) => setUrl(target.value)}
-            />
-        </div>
-        <button type="submit">create</button>
-      </form>
-    </div>
-  )
 
   const logout = () => {
     window.localStorage.removeItem('loggedBlogappUser')
     setUser(null)
   }
 
+
   return (
     <div>
       <h1>Blogs</h1>
       <Notification message={message} color={color} />
       {user === null ?
-      loginForm() :
-      <div>
-        <p>{user.name} logged in <button onClick={() => logout()}>Logout</button></p>
-        {blogForm()}
-        <Blog blog={userBlogs()} />
-      </div>
-    }
+        <LoginForm
+          username={username}
+          password={password}
+          handleUsernameChange={({ target }) => setUsername(target.value)}
+          handlePasswordChange={({ target }) => setPassword(target.value)}
+          handleSubmit={handleLogin}
+        /> :
+        <div>
+          <p>{user.name} logged in <button onClick={() => logout()}>Logout</button></p>
+          <Togglable buttonLabel="new blog" ref={blogFormRef}>
+            <BlogForm
+              title={title}
+              author={author}
+              url={url}
+              handleTitleChange={({ target }) => setTitle(target.value)}
+              handleAuthorChange={({ target }) => setAuthor(target.value)}
+              handleUrlChange={({ target }) => setUrl(target.value)}
+              handleSubmit={handleBlogPost}
+            />
+          </Togglable>
+          <Blog
+            blogTitles={blogTitles()}
+          />
+        </div>
+      }
     </div>
-  );
+  )
 }
 
-export default App;
+export default App
