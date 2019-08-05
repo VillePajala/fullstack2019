@@ -3,9 +3,6 @@ import PropTypes from 'prop-types'
 
 const BlogForm = ({
   handleSubmit,
-  handleTitleChange,
-  handleAuthorChange,
-  handleUrlChange,
   title,
   author,
   url,
@@ -15,30 +12,15 @@ const BlogForm = ({
       <form onSubmit={handleSubmit}>
         <div>
           title:
-          <input
-            type="text"
-            value={title}
-            name="title"
-            onChange={handleTitleChange}
-          />
+          <input {...title} />
         </div>
         <div>
           author
-          <input
-            type="text"
-            value={author}
-            name="author"
-            onChange={handleAuthorChange}
-          />
+          <input {...author} />
         </div>
         <div>
           url
-          <input
-            type="text"
-            value={url}
-            name="url"
-            onChange={handleUrlChange}
-          />
+          <input {...url} />
         </div>
         <button type="submit">create</button>
       </form>
