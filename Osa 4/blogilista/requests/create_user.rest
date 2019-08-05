@@ -2,7 +2,7 @@ POST http://localhost:3003/api/users
 Content-Type: application/json
 
 {
-    "username": "robottixi",
-    "name": "Su",
-    "password": "se"
+    "username": "villepajala",
+    "name": "Ville Pajala",
+    "password": "fulstack"
 }
