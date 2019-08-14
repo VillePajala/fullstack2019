@@ -25,11 +25,11 @@ const generateId = () => Number((Math.random() * 1000000).toFixed(0))
 export const addAnecdote = (content) => {
   return {
     type: 'NEW_ANECDOTE',
-      data: {
-        content,
-        votes: 0,
-        id: generateId()
-      }
+    data: {
+      content,
+      votes: 0,
+      id: generateId()
+    }
   }
 }
 

@@ -1,20 +1,25 @@
 import React from 'react'
-import addAnecdote from '../reducers/anecdoteReducer'
+import { addAnecdote } from '../reducers/anecdoteReducer'
 
 const AnecdoteForm = (props) => {
     const createAnecdote = (event) => {
         event.preventDefault()
-        props.store.dispatch(
-          addAnecdote(event.target.anecdote.value)
-        )
+        const content = event.target.anecdote.value
         event.target.anecdote.value = ''
+        props.store.dispatch(
+          addAnecdote(content)
+        )
       }
 
     return (
-      <form onSubmit={createAnecdote}>
-        <div><input name="anecdote"/></div>
-        <button type="submit">create</button>
-      </form>
+      <div>
+        <h2>create new</h2>
+        <form onSubmit={createAnecdote}>
+          <div><input name="anecdote"/></div>
+          <button type="submit">create</button>
+        </form>
+      </div>
+        
     )
   }
   
