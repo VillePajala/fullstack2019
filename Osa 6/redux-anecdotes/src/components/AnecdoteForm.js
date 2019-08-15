@@ -1,21 +1,24 @@
 import React from 'react'
+import { connect } from 'react-redux'
 import { addAnecdote } from '../reducers/anecdoteReducer'
+import Filter from './Filter'
 
 const AnecdoteForm = (props) => {
     const createAnecdote = (event) => {
         event.preventDefault()
         const content = event.target.anecdote.value
         event.target.anecdote.value = ''
-        props.store.dispatch(
-          addAnecdote(content)
-        )
+        props.addAnecdote(content)
       }
 
     return (
       <div>
-        <h2>create new</h2>
+        <Filter />
+        <h3>create new</h3>
         <form onSubmit={createAnecdote}>
-          <div><input name="anecdote"/></div>
+          <div>
+            <input name="anecdote"/>
+          </div>
           <button type="submit">create</button>
         </form>
       </div>
@@ -23,4 +26,19 @@ const AnecdoteForm = (props) => {
     )
   }
   
-  export default AnecdoteForm
+const mapStateToProps = (state) => {
+  return {
+    anecdotes: state.anecdotes,
+    notification: state.notification,
+    filter: state.filter
+  }
+}
+
+const mapDispatchToProps = {
+  addAnecdote
+}
+
+export default connect(
+  mapStateToProps,
+  mapDispatchToProps
+  )(AnecdoteForm)
