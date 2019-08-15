@@ -12,11 +12,8 @@ const AnecdotesList = (props) => {
           key={anecdote.id}
           anecdote={anecdote}
           handleClick={() => {
-            props.addVote(anecdote.id)
-            props.notificationChange(`You voted: "${anecdote.content}"`)
-            setTimeout(() => {
-              props.notificationChange('Notification area')
-            }, 5000)
+            props.addVote(anecdote)
+            props.notificationChange(`You voted: "${anecdote.content}"`, 10)
             }
           }
         />
